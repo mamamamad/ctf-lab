@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profile — CTF Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/theme.css" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header>
+      <span class="brand">CTF Platform</span>
+      <span class="service-tag">auth.svc</span>
+    </header>
+    <main>
+      <div class="panel">
+        <h1>Your profile</h1>
+        <p class="subtitle">Only you and services holding a valid token can read this.</p>
+        <div id="message" class="message"></div>
+        <div id="fields"></div>
+        <button id="logout" type="button">Sign out</button>
+      </div>
+    </main>
+
+    <script type="module">
+      import { apiFetch, showMessage, clearTokens, getRefreshToken, redirectIfGuest } from '/app.js';
+
+      redirectIfGuest();
+
+      const fieldsEl = document.getElementById('fields');
+      const message = document.getElementById('message');
+
+      function field(label, value) {
+        const row = document.createElement('div');
+        row.className = 'profile-field';
+        row.innerHTML = `<span class="label">${label}</span><span class="value">${value}</span>`;
+        return row;
+      }
+
+      apiFetch('/me')
+        .then((user) => {
+          fieldsEl.append(
+            field('Username', user.username),
+            field('Email', user.email),
+            field('Role', user.role),
+            field('User ID', user.id),
+            field('Joined', new Date(user.createdAt).toLocaleDateString())
+          );
+        })
+        .catch((err) => {
+          showMessage(message, err.message, 'error');
+          clearTokens();
+          setTimeout(() => (window.location.href = '/login.html'), 1200);
+        });
+
+      document.getElementById('logout').addEventListener('click', async () => {
+        try {
+          await apiFetch('/logout', {
+            method: 'POST',
+            body: JSON.stringify({ refreshToken: getRefreshToken() }),
+          });
+        } catch {
+          // even if the server call fails, still clear local tokens below
+        }
+        clearTokens();
+        window.location.href = '/login.html';
+      });
+    </script>
+  </body>
+</html>

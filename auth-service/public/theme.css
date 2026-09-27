@@ -1,0 +1,19 @@
+/*
+  Theme layer. Every color/font/radius the UI uses comes from here.
+  To re-skin the platform for a different competition, replace only
+  this file — styles.css never hardcodes a color or font of its own.
+*/
+:root {
+  --bg: #0b0e14;
+  --surface: #12161f;
+  --surface-border: #232838;
+  --text: #e4e7ec;
+  --text-dim: #7c8496;
+  --accent: #5eead4;
+  --accent-contrast: #06231f;
+  --danger: #f87171;
+
+  --radius: 4px;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+}

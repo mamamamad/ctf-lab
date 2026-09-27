@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Create account — CTF Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/theme.css" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header>
+      <span class="brand">CTF Platform</span>
+      <span class="service-tag">auth.svc</span>
+    </header>
+    <main>
+      <div class="panel">
+        <h1>Create account</h1>
+        <p class="subtitle">Register to start solving challenges.</p>
+        <div id="message" class="message"></div>
+        <form id="register-form">
+          <label>
+            Email
+            <input type="email" name="email" required autocomplete="email" />
+          </label>
+          <label>
+            Username
+            <input type="text" name="username" required minlength="3" autocomplete="username" />
+          </label>
+          <label>
+            Password
+            <input type="password" name="password" required minlength="8" autocomplete="new-password" />
+          </label>
+          <button type="submit">Create account</button>
+        </form>
+        <p class="footnote">Already have an account? <a href="/login.html">Sign in</a></p>
+      </div>
+    </main>
+
+    <script type="module">
+      import { apiFetch, showMessage, redirectIfAuthed } from '/app.js';
+
+      redirectIfAuthed();
+
+      const form = document.getElementById('register-form');
+      const message = document.getElementById('message');
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const button = form.querySelector('button');
+        button.disabled = true;
+
+        const email = form.email.value.trim();
+        const username = form.username.value.trim();
+        const password = form.password.value;
+
+        try {
+          await apiFetch('/register', {
+            method: 'POST',
+            body: JSON.stringify({ email, username, password }),
+          });
+          showMessage(message, 'Account created — you can sign in now.', 'success');
+          form.reset();
+        } catch (err) {
+          showMessage(message, err.message, 'error');
+        } finally {
+          button.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
